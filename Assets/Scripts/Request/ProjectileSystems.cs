@@ -2,6 +2,7 @@ using System;
 using AOT;
 using Unity.Burst;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.NetCode;
 using Unity.Networking.Transport;
 
@@ -13,9 +14,12 @@ public class ProjectileClientSystem : ComponentSystem {
   }
 
   protected override void OnUpdate () {
-    Entities.WithNone<NetworkStreamInGame> ().ForEach ((Entity ent, ref NetworkIdComponent id) => {
+    Entities.WithNone<NetworkStreamInGame> ().ForEach ((Entity ent, ref ProjectileRequest request, ref NetworkIdComponent id) => {
       PostUpdateCommands.AddComponent<NetworkStreamInGame> (ent);
       var req = PostUpdateCommands.CreateEntity ();
+      PostUpdateCommands.AddComponent (req, new ProjectileComponent {
+        origin = new float3 (request.ox, request.oy, request.oz),
+      });
       PostUpdateCommands.AddComponent<ProjectileRequest> (req);
       PostUpdateCommands.AddComponent (req, new SendRpcCommandRequestComponent { TargetConnection = ent });
     });

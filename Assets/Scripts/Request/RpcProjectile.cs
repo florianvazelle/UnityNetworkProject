@@ -5,9 +5,22 @@ using Unity.Networking.Transport;
 
 [BurstCompile]
 public struct ProjectileRequest : IRpcCommand {
-  public void Serialize (ref DataStreamWriter writer) { }
 
-  public void Deserialize (ref DataStreamReader reader) { }
+  public float ox;
+  public float oy;
+  public float oz;
+
+  public void Serialize (ref DataStreamWriter writer) {
+    writer.WriteFloat (ox);
+    writer.WriteFloat (oy);
+    writer.WriteFloat (oz);
+  }
+
+  public void Deserialize (ref DataStreamReader reader) {
+    ox = reader.ReadFloat ();
+    oy = reader.ReadFloat ();
+    oz = reader.ReadFloat ();
+  }
 
   [BurstCompile]
   [MonoPInvokeCallback (typeof (RpcExecutor.ExecuteDelegate))]
