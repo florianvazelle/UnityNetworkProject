@@ -4,6 +4,7 @@
     "com.unity.ide.rider": "2.0.2",
     "com.unity.ide.vscode": "1.2.0",
     "com.unity.netcode": "0.2.0-preview.5",
+    "com.unity.physics": "0.3.2-preview",
     "com.unity.platforms.linux": "0.4.0-preview.3",
     "com.unity.platforms.macos": "0.4.0-preview.3",
     "com.unity.platforms.windows": "0.4.0-preview.3",
@@ -43,5 +44,8 @@
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
   },
-  "testables": ["com.unity.transport", "com.unity.netcode"]
+  "testables": [
+    "com.unity.transport",
+    "com.unity.netcode"
+  ]
 }
