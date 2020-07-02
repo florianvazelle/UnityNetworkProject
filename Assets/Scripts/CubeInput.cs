@@ -83,13 +83,13 @@ public class SampleCubeInput : ComponentSystem
         }
         var input = default(CubeInput);
         input.tick = World.GetExistingSystem<ClientSimulationSystemGroup>().ServerTick;
-        if (Input.GetKey("a"))
+        if (Input.GetKey("q"))
             input.horizontal -= 1;
         if (Input.GetKey("d"))
             input.horizontal += 1;
         if (Input.GetKey("s"))
             input.vertical -= 1;
-        if (Input.GetKey("w"))
+        if (Input.GetKey("z"))
             input.vertical += 1;
         var inputBuffer = EntityManager.GetBuffer<CubeInput>(localInput);
         inputBuffer.AddCommandData(input);
