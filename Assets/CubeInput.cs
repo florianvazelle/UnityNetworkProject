@@ -23,18 +23,21 @@ public struct CubeInput : ICommandData<CubeInput>
     public uint tick;
     public int horizontal;
     public int vertical;
+    public int rotation;
 
     public void Deserialize(uint tick, ref DataStreamReader reader)
     {
         this.tick = tick;
         horizontal = reader.ReadInt();
         vertical = reader.ReadInt();
+        rotation = reader.ReadInt();
     }
 
     public void Serialize(ref DataStreamWriter writer)
     {
         writer.WriteInt(horizontal);
         writer.WriteInt(vertical);
+        writer.WriteInt(rotation);
     }
 
     public void Deserialize(uint tick, ref DataStreamReader reader, CubeInput baseline,
@@ -91,6 +94,10 @@ public class SampleCubeInput : ComponentSystem
             input.vertical -= 1;
         if (Input.GetKey("w"))
             input.vertical += 1;
+        if (Input.GetKey ("r"))
+            input.rotation += 1;
+        if (Input.GetKey ("y"))
+            input.rotation -= 1;
         var inputBuffer = EntityManager.GetBuffer<CubeInput>(localInput);
         inputBuffer.AddCommandData(input);
     }
