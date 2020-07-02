@@ -1,4 +1,4 @@
-
+using System;
 using Unity.Entities;
 using Unity.NetCode;
 using Unity.Networking.Transport;
@@ -8,7 +8,7 @@ using UnityEngine;
 
 #if SERVER_INPUT_SETUP
             var ghostCollection = GetSingleton<GhostPrefabCollectionComponent>();
-            var ghostId = GhostSerializerCollection.FindGhostType<CubeSnapshotData>();
+            var ghostId = GhostSerializerCollection.FindGhostType<ProjectileSnapshotData>();
             var prefab = EntityManager.GetBuffer<GhostPrefabBuffer>(ghostCollection.serverPrefabs)[ghostId].Value;
             var player = EntityManager.Instantiate(prefab);
             EntityManager.SetComponentData(player, new MovableCubeComponent { PlayerId = EntityManager.GetComponentData<NetworkIdComponent>(req.SourceConnection).Value});
@@ -100,6 +100,14 @@ public class SampleCubeInput : ComponentSystem
             input.rotation -= 1;
         var inputBuffer = EntityManager.GetBuffer<CubeInput>(localInput);
         inputBuffer.AddCommandData(input);
+
+        
+        if (Input.GetMouseButton(1))
+        {
+            var req = PostUpdateCommands.CreateEntity();
+            PostUpdateCommands.AddComponent<ProjectileRequest>(req);
+            PostUpdateCommands.AddComponent(req, new SendRpcCommandRequestComponent {TargetConnection = Entity.Null});
+        }
     }
 }
 #endif

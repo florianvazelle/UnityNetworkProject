@@ -481,11 +481,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c75b8787d8624691813514d3823a59f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RootPath: /Samples/NetCube/Generated
+  RootPath: /Scripts/Generated
   SerializerCollectionPath: GhostSerializerCollection.cs
   DeserializerCollectionPath: GhostDeserializerCollection.cs
   NamePrefix: NetCube
   Ghosts:
   - prefab: {fileID: 2552174147846842480, guid: 14215e81cfff4bc43aec79d515d61daa,
+      type: 3}
+    enabled: 1
+  - prefab: {fileID: 6767299896869030091, guid: edf3a15ebd28f8d8c919d0dc4e37f747,
       type: 3}
     enabled: 1
