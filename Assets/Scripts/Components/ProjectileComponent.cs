@@ -1,7 +1,7 @@
 using Unity.Entities;
 using Unity.Mathematics;
 
-public struct InitProjectileTag : IComponentData {
+public struct InitProjectileComponent : IComponentData {
   public float3 origin;
 }
 

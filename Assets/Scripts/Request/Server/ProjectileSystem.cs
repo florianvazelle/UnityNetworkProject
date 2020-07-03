@@ -7,27 +7,7 @@ using Unity.NetCode;
 using Unity.Networking.Transport;
 using Unity.Transforms;
 
-// When client has a connection with network id, go in game and tell server to also go in game
-[UpdateInGroup (typeof (ClientSimulationSystemGroup))]
-public class ProjectileClientSystem : ComponentSystem {
-  protected override void OnCreate () {
-    RequireSingletonForUpdate<EnableNetCubeGhostReceiveSystemComponent> ();
-  }
-
-  protected override void OnUpdate () {
-    Entities.WithNone<NetworkStreamInGame> ().ForEach ((Entity ent, ref ProjectileRequest request, ref NetworkIdComponent id) => {
-      PostUpdateCommands.AddComponent<NetworkStreamInGame> (ent);
-      var entity = PostUpdateCommands.CreateEntity ();
-      // PostUpdateCommands.AddComponent (entity, new ProjectileComponent {
-      //   origin = new float3 (request.ox, request.oy, request.oz),
-      // });
-      PostUpdateCommands.AddComponent<ProjectileRequest> (entity);
-      PostUpdateCommands.AddComponent (entity, new SendRpcCommandRequestComponent { TargetConnection = ent });
-    });
-  }
-}
-
-// When server receives go in game request, go in game and delete request
+// When server receives projectile request, create projectile and delete request
 [UpdateInGroup (typeof (ServerSimulationSystemGroup))]
 public class ProjectileServerSystem : ComponentSystem {
   protected override void OnCreate () {
@@ -43,7 +23,7 @@ public class ProjectileServerSystem : ComponentSystem {
       var prefab = EntityManager.GetBuffer<GhostPrefabBuffer> (ghostCollection.serverPrefabs) [ghostId].Value;
 
       var projectile = EntityManager.Instantiate (prefab);
-      PostUpdateCommands.AddComponent (projectile, new InitProjectileTag {
+      PostUpdateCommands.AddComponent (projectile, new InitProjectileComponent {
         origin = new float3 (request.ox, request.oy, request.oz)
       });
       PostUpdateCommands.AddComponent (projectile, new ProjectileComponent {
