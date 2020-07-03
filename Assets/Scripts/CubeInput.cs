@@ -97,7 +97,8 @@ public class SampleCubeInput : ComponentSystem {
 
         var projectile = PostUpdateCommands.CreateEntity ();
         PostUpdateCommands.AddComponent (projectile, new ProjectileRequest {
-          ox = position.x, oy = position.y, oz = position.z,
+          playerId = GetSingleton<NetworkIdComponent> ().Value,
+            ox = position.x, oy = position.y, oz = position.z,
             vx = vector.x, vy = vector.y, vz = vector.z,
         });
         PostUpdateCommands.AddComponent (projectile, new SendRpcCommandRequestComponent { TargetConnection = Entity.Null });

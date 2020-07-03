@@ -14,6 +14,8 @@ public struct ProjectileRequest : IRpcCommand {
   public float vy;
   public float vz;
 
+  public int playerId;
+
   public void Serialize (ref DataStreamWriter writer) {
     writer.WriteFloat (ox);
     writer.WriteFloat (oy);
@@ -22,6 +24,8 @@ public struct ProjectileRequest : IRpcCommand {
     writer.WriteFloat (vx);
     writer.WriteFloat (vy);
     writer.WriteFloat (vz);
+
+    writer.WriteInt (playerId);
   }
 
   public void Deserialize (ref DataStreamReader reader) {
@@ -32,6 +36,8 @@ public struct ProjectileRequest : IRpcCommand {
     vx = reader.ReadFloat ();
     vy = reader.ReadFloat ();
     vz = reader.ReadFloat ();
+
+    playerId = reader.ReadInt ();
   }
 
   [BurstCompile]

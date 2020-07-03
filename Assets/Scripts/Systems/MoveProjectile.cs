@@ -21,7 +21,7 @@ public class MoveProjectileSystem : ComponentSystem {
       if (!GhostPredictionSystemGroup.ShouldPredict (tick, prediction))
         return;
 
-      trans.Value += projectile.vector * deltaTime * 2f;
+      trans.Value += projectile.vector * deltaTime * 3f;
     });
   }
 }

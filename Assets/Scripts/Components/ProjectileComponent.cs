@@ -6,5 +6,6 @@ public struct InitProjectileComponent : IComponentData {
 }
 
 public struct ProjectileComponent : IComponentData {
+  public int playerId;
   public float3 vector;
 }

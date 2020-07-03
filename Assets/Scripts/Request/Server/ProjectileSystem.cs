@@ -27,7 +27,8 @@ public class ProjectileServerSystem : ComponentSystem {
         origin = new float3 (request.ox, request.oy, request.oz)
       });
       PostUpdateCommands.AddComponent (projectile, new ProjectileComponent {
-        vector = new float3 (request.vx, request.vy, request.vz),
+        playerId = request.playerId,
+          vector = new float3 (request.vx, request.vy, request.vz),
       });
 
       PostUpdateCommands.DestroyEntity (reqEnt);
