@@ -13,11 +13,12 @@ public struct NetCubeGhostSerializerCollection : IGhostSerializerCollection
         {
             "CubeGhostSerializer",
             "SphereGhostSerializer",
+            "Tree_1GhostSerializer",
         };
         return arr;
     }
 
-    public int Length => 2;
+    public int Length => 3;
 #endif
     public static int FindGhostType<T>()
         where T : struct, ISnapshotData<T>
@@ -26,6 +27,8 @@ public struct NetCubeGhostSerializerCollection : IGhostSerializerCollection
             return 0;
         if (typeof(T) == typeof(SphereSnapshotData))
             return 1;
+        if (typeof(T) == typeof(Tree_1SnapshotData))
+            return 2;
         return -1;
     }
 
@@ -33,6 +36,7 @@ public struct NetCubeGhostSerializerCollection : IGhostSerializerCollection
     {
         m_CubeGhostSerializer.BeginSerialize(system);
         m_SphereGhostSerializer.BeginSerialize(system);
+        m_Tree_1GhostSerializer.BeginSerialize(system);
     }
 
     public int CalculateImportance(int serializer, ArchetypeChunk chunk)
@@ -43,6 +47,8 @@ public struct NetCubeGhostSerializerCollection : IGhostSerializerCollection
                 return m_CubeGhostSerializer.CalculateImportance(chunk);
             case 1:
                 return m_SphereGhostSerializer.CalculateImportance(chunk);
+            case 2:
+                return m_Tree_1GhostSerializer.CalculateImportance(chunk);
         }
 
         throw new ArgumentException("Invalid serializer type");
@@ -56,6 +62,8 @@ public struct NetCubeGhostSerializerCollection : IGhostSerializerCollection
                 return m_CubeGhostSerializer.SnapshotSize;
             case 1:
                 return m_SphereGhostSerializer.SnapshotSize;
+            case 2:
+                return m_Tree_1GhostSerializer.SnapshotSize;
         }
 
         throw new ArgumentException("Invalid serializer type");
@@ -73,12 +81,17 @@ public struct NetCubeGhostSerializerCollection : IGhostSerializerCollection
             {
                 return GhostSendSystem<NetCubeGhostSerializerCollection>.InvokeSerialize<SphereGhostSerializer, SphereSnapshotData>(m_SphereGhostSerializer, ref dataStream, data);
             }
+            case 2:
+            {
+                return GhostSendSystem<NetCubeGhostSerializerCollection>.InvokeSerialize<Tree_1GhostSerializer, Tree_1SnapshotData>(m_Tree_1GhostSerializer, ref dataStream, data);
+            }
             default:
                 throw new ArgumentException("Invalid serializer type");
         }
     }
     private CubeGhostSerializer m_CubeGhostSerializer;
     private SphereGhostSerializer m_SphereGhostSerializer;
+    private Tree_1GhostSerializer m_Tree_1GhostSerializer;
 }
 
 public struct EnableNetCubeGhostSendSystemComponent : IComponentData

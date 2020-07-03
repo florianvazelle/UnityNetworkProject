@@ -13,11 +13,12 @@ public struct NetCubeGhostDeserializerCollection : IGhostDeserializerCollection
         {
             "CubeGhostSerializer",
             "SphereGhostSerializer",
+            "Tree_1GhostSerializer",
         };
         return arr;
     }
 
-    public int Length => 2;
+    public int Length => 3;
 #endif
     public void Initialize(World world)
     {
@@ -29,12 +30,17 @@ public struct NetCubeGhostDeserializerCollection : IGhostDeserializerCollection
         m_SphereSnapshotDataNewGhostIds = curSphereGhostSpawnSystem.NewGhostIds;
         m_SphereSnapshotDataNewGhosts = curSphereGhostSpawnSystem.NewGhosts;
         curSphereGhostSpawnSystem.GhostType = 1;
+        var curTree_1GhostSpawnSystem = world.GetOrCreateSystem<Tree_1GhostSpawnSystem>();
+        m_Tree_1SnapshotDataNewGhostIds = curTree_1GhostSpawnSystem.NewGhostIds;
+        m_Tree_1SnapshotDataNewGhosts = curTree_1GhostSpawnSystem.NewGhosts;
+        curTree_1GhostSpawnSystem.GhostType = 2;
     }
 
     public void BeginDeserialize(JobComponentSystem system)
     {
         m_CubeSnapshotDataFromEntity = system.GetBufferFromEntity<CubeSnapshotData>();
         m_SphereSnapshotDataFromEntity = system.GetBufferFromEntity<SphereSnapshotData>();
+        m_Tree_1SnapshotDataFromEntity = system.GetBufferFromEntity<Tree_1SnapshotData>();
     }
     public bool Deserialize(int serializer, Entity entity, uint snapshot, uint baseline, uint baseline2, uint baseline3,
         ref DataStreamReader reader, NetworkCompressionModel compressionModel)
@@ -46,6 +52,9 @@ public struct NetCubeGhostDeserializerCollection : IGhostDeserializerCollection
                 baseline3, ref reader, compressionModel);
             case 1:
                 return GhostReceiveSystem<NetCubeGhostDeserializerCollection>.InvokeDeserialize(m_SphereSnapshotDataFromEntity, entity, snapshot, baseline, baseline2,
+                baseline3, ref reader, compressionModel);
+            case 2:
+                return GhostReceiveSystem<NetCubeGhostDeserializerCollection>.InvokeDeserialize(m_Tree_1SnapshotDataFromEntity, entity, snapshot, baseline, baseline2,
                 baseline3, ref reader, compressionModel);
             default:
                 throw new ArgumentException("Invalid serializer type");
@@ -64,6 +73,10 @@ public struct NetCubeGhostDeserializerCollection : IGhostDeserializerCollection
                 m_SphereSnapshotDataNewGhostIds.Add(ghostId);
                 m_SphereSnapshotDataNewGhosts.Add(GhostReceiveSystem<NetCubeGhostDeserializerCollection>.InvokeSpawn<SphereSnapshotData>(snapshot, ref reader, compressionModel));
                 break;
+            case 2:
+                m_Tree_1SnapshotDataNewGhostIds.Add(ghostId);
+                m_Tree_1SnapshotDataNewGhosts.Add(GhostReceiveSystem<NetCubeGhostDeserializerCollection>.InvokeSpawn<Tree_1SnapshotData>(snapshot, ref reader, compressionModel));
+                break;
             default:
                 throw new ArgumentException("Invalid serializer type");
         }
@@ -75,6 +88,9 @@ public struct NetCubeGhostDeserializerCollection : IGhostDeserializerCollection
     private BufferFromEntity<SphereSnapshotData> m_SphereSnapshotDataFromEntity;
     private NativeList<int> m_SphereSnapshotDataNewGhostIds;
     private NativeList<SphereSnapshotData> m_SphereSnapshotDataNewGhosts;
+    private BufferFromEntity<Tree_1SnapshotData> m_Tree_1SnapshotDataFromEntity;
+    private NativeList<int> m_Tree_1SnapshotDataNewGhostIds;
+    private NativeList<Tree_1SnapshotData> m_Tree_1SnapshotDataNewGhosts;
 }
 public struct EnableNetCubeGhostReceiveSystemComponent : IComponentData
 {}
