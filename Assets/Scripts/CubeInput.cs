@@ -103,13 +103,15 @@ public class SampleCubeInput : ComponentSystem {
       Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
       if (plane.Raycast (ray, out distance)) {
         Vector3 vector = ray.GetPoint (distance);
-        vector.y = position.y;
+        vector.x = vector.x - position.x;
+        vector.y = 0;
+        vector.z = vector.z - position.z;
         vector = Vector3.Normalize (vector);
 
         var projectile = PostUpdateCommands.CreateEntity ();
         PostUpdateCommands.AddComponent (projectile, new ProjectileRequest {
           ox = position.x, oy = position.y, oz = position.z,
-            vx = vector.x, vy = position.y, vz = vector.z,
+            vx = vector.x, vy = vector.y, vz = vector.z,
         });
         PostUpdateCommands.AddComponent (projectile, new SendRpcCommandRequestComponent { TargetConnection = Entity.Null });
       }
