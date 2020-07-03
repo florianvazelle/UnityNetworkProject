@@ -2,6 +2,7 @@ using System;
 using Unity.Entities;
 using Unity.NetCode;
 using Unity.Networking.Transport;
+using Unity.Transforms;
 using UnityEngine;
 
 #if true
@@ -52,16 +53,19 @@ public class NetCubeReceiveCommandSystem : CommandReceiveSystem<CubeInput> { }
 
 [UpdateInGroup (typeof (ClientSimulationSystemGroup))]
 public class SampleCubeInput : ComponentSystem {
+  private int m_FrameCount;
+
   protected override void OnCreate () {
     RequireSingletonForUpdate<NetworkIdComponent> ();
     RequireSingletonForUpdate<EnableNetCubeGhostReceiveSystemComponent> ();
   }
 
   protected override void OnUpdate () {
+
     var localInput = GetSingleton<CommandTargetComponent> ().targetEntity;
     if (localInput == Entity.Null) {
       var localPlayerId = GetSingleton<NetworkIdComponent> ().Value;
-      Entities.WithNone<CubeInput> ().ForEach ((Entity ent, ref MovableCubeComponent cube) => {
+      Entities.WithNone<CubeInput> ().ForEach ((Entity ent, ref Translation trans, ref MovableCubeComponent cube) => {
         if (cube.PlayerId == localPlayerId) {
           PostUpdateCommands.AddBuffer<CubeInput> (ent);
           PostUpdateCommands.SetComponent (GetSingletonEntity<CommandTargetComponent> (), new CommandTargetComponent { targetEntity = ent });
@@ -69,6 +73,7 @@ public class SampleCubeInput : ComponentSystem {
       });
       return;
     }
+
     var input = default (CubeInput);
     input.tick = World.GetExistingSystem<ClientSimulationSystemGroup> ().ServerTick;
     if (Input.GetKey ("q"))
@@ -86,12 +91,28 @@ public class SampleCubeInput : ComponentSystem {
     var inputBuffer = EntityManager.GetBuffer<CubeInput> (localInput);
     inputBuffer.AddCommandData (input);
 
-    if (Input.GetMouseButton (1)) {
-      var req = PostUpdateCommands.CreateEntity ();
-      PostUpdateCommands.AddComponent (req, new ProjectileRequest {
-        ox = 5, oy = 1, oz = 5
-      });
-      PostUpdateCommands.AddComponent (req, new SendRpcCommandRequestComponent { TargetConnection = Entity.Null });
+    Vector3 position = EntityManager.GetComponentData<Translation> (localInput).Value;
+
+    ++m_FrameCount;
+    if (Input.GetMouseButton (1) && m_FrameCount % 50 == 0) {
+      m_FrameCount = 0;
+
+      Plane plane = new Plane (Vector3.up, 0);
+
+      float distance;
+      Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+      if (plane.Raycast (ray, out distance)) {
+        Vector3 vector = ray.GetPoint (distance);
+        vector.y = position.y;
+        vector = Vector3.Normalize (vector);
+
+        var projectile = PostUpdateCommands.CreateEntity ();
+        PostUpdateCommands.AddComponent (projectile, new ProjectileRequest {
+          ox = position.x, oy = position.y, oz = position.z,
+            vx = vector.x, vy = position.y, vz = vector.z,
+        });
+        PostUpdateCommands.AddComponent (projectile, new SendRpcCommandRequestComponent { TargetConnection = Entity.Null });
+      }
     }
   }
 }

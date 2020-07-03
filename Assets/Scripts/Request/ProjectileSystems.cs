@@ -5,6 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.NetCode;
 using Unity.Networking.Transport;
+using Unity.Transforms;
 
 // When client has a connection with network id, go in game and tell server to also go in game
 [UpdateInGroup (typeof (ClientSimulationSystemGroup))]
@@ -16,12 +17,12 @@ public class ProjectileClientSystem : ComponentSystem {
   protected override void OnUpdate () {
     Entities.WithNone<NetworkStreamInGame> ().ForEach ((Entity ent, ref ProjectileRequest request, ref NetworkIdComponent id) => {
       PostUpdateCommands.AddComponent<NetworkStreamInGame> (ent);
-      var req = PostUpdateCommands.CreateEntity ();
-      PostUpdateCommands.AddComponent (req, new ProjectileComponent {
-        origin = new float3 (request.ox, request.oy, request.oz),
-      });
-      PostUpdateCommands.AddComponent<ProjectileRequest> (req);
-      PostUpdateCommands.AddComponent (req, new SendRpcCommandRequestComponent { TargetConnection = ent });
+      var entity = PostUpdateCommands.CreateEntity ();
+      // PostUpdateCommands.AddComponent (entity, new ProjectileComponent {
+      //   origin = new float3 (request.ox, request.oy, request.oz),
+      // });
+      PostUpdateCommands.AddComponent<ProjectileRequest> (entity);
+      PostUpdateCommands.AddComponent (entity, new SendRpcCommandRequestComponent { TargetConnection = ent });
     });
   }
 }
@@ -34,7 +35,7 @@ public class ProjectileServerSystem : ComponentSystem {
   }
 
   protected override void OnUpdate () {
-    Entities.WithNone<SendRpcCommandRequestComponent> ().ForEach ((Entity reqEnt, ref ProjectileRequest req, ref ReceiveRpcCommandRequestComponent reqSrc) => {
+    Entities.WithNone<SendRpcCommandRequestComponent> ().ForEach ((Entity reqEnt, ref ProjectileRequest request, ref ReceiveRpcCommandRequestComponent reqSrc) => {
       PostUpdateCommands.AddComponent<NetworkStreamInGame> (reqSrc.SourceConnection);
 
       var ghostCollection = GetSingleton<GhostPrefabCollectionComponent> ();
@@ -42,6 +43,12 @@ public class ProjectileServerSystem : ComponentSystem {
       var prefab = EntityManager.GetBuffer<GhostPrefabBuffer> (ghostCollection.serverPrefabs) [ghostId].Value;
 
       var projectile = EntityManager.Instantiate (prefab);
+      PostUpdateCommands.AddComponent (projectile, new InitProjectileTag {
+        origin = new float3 (request.ox, request.oy, request.oz)
+      });
+      PostUpdateCommands.AddComponent (projectile, new ProjectileComponent {
+        vector = new float3 (request.vx, request.vy, request.vz),
+      });
 
       PostUpdateCommands.DestroyEntity (reqEnt);
     });

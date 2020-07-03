@@ -10,16 +10,28 @@ public struct ProjectileRequest : IRpcCommand {
   public float oy;
   public float oz;
 
+  public float vx;
+  public float vy;
+  public float vz;
+
   public void Serialize (ref DataStreamWriter writer) {
     writer.WriteFloat (ox);
     writer.WriteFloat (oy);
     writer.WriteFloat (oz);
+
+    writer.WriteFloat (vx);
+    writer.WriteFloat (vy);
+    writer.WriteFloat (vz);
   }
 
   public void Deserialize (ref DataStreamReader reader) {
     ox = reader.ReadFloat ();
     oy = reader.ReadFloat ();
     oz = reader.ReadFloat ();
+
+    vx = reader.ReadFloat ();
+    vy = reader.ReadFloat ();
+    vz = reader.ReadFloat ();
   }
 
   [BurstCompile]
