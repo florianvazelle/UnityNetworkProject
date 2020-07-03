@@ -5,19 +5,6 @@ using Unity.Networking.Transport;
 using Unity.Transforms;
 using UnityEngine;
 
-#if true
-
-#if SERVER_INPUT_SETUP
-var ghostCollection = GetSingleton<GhostPrefabCollectionComponent> ();
-var ghostId = GhostSerializerCollection.FindGhostType<ProjectileSnapshotData> ();
-var prefab = EntityManager.GetBuffer<GhostPrefabBuffer> (ghostCollection.serverPrefabs) [ghostId].Value;
-var player = EntityManager.Instantiate (prefab);
-EntityManager.SetComponentData (player, new MovableCubeComponent { PlayerId = EntityManager.GetComponentData<NetworkIdComponent> (req.SourceConnection).Value });
-
-PostUpdateCommands.AddBuffer<CubeInput> (player);
-PostUpdateCommands.SetComponent (req.SourceConnection, new CommandTargetComponent { targetEntity = player });
-#endif
-
 public struct CubeInput : ICommandData<CubeInput> {
   public uint Tick => tick;
   public uint tick;
@@ -118,4 +105,3 @@ public class SampleCubeInput : ComponentSystem {
     }
   }
 }
-#endif
