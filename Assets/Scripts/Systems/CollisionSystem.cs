@@ -32,6 +32,7 @@ public class CollisionSystem : ComponentSystem {
 
           Circle circle = new Circle { x = projectilePositions[j].Value.x, y = projectilePositions[j].Value.z, radius = 0.5f };
           if (CircleToRectangle (circle, rect)) {
+            // UI.Instance.updatePlayerScore (cube.PlayerId);
             // Death
             trans.Value = new float3 (0, 0.5f, 0);
             PostUpdateCommands.SetComponent (projectiles[j], new Translation { Value = new float3 (100, 0, 100) });

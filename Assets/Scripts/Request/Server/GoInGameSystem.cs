@@ -26,6 +26,8 @@ public class GoInGameServerSystem : ComponentSystem {
       PostUpdateCommands.AddBuffer<CubeInput> (player);
       PostUpdateCommands.SetComponent (reqSrc.SourceConnection, new CommandTargetComponent { targetEntity = player });
 
+      UI.Instance.addPlayer (EntityManager.GetComponentData<NetworkIdComponent> (reqSrc.SourceConnection).Value);
+
       PostUpdateCommands.DestroyEntity (reqEnt);
     });
   }
